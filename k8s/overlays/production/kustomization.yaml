@@ -6,6 +6,7 @@ namespace: marketing-automation
 resources:
   - ../../base
   - ../../services/xlam-server
+  - ../../services/mcp-config-server
   - ../../services/n8n
   - ../../services/crm-twenty
   - ../../services/dashboard-streamlit
