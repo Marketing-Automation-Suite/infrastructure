@@ -16,19 +16,20 @@ REPOS=(
 )
 
 # Standard labels for all repositories
+# Format: name|color|description
 LABELS=(
-  "bug:FF0000:Bug or issue with the code"
-  "enhancement:00FF00:New feature or enhancement"
-  "documentation:0066FF:Documentation improvements"
-  "question:FF9900:Question or discussion"
-  "help wanted:FF00FF:Help needed from the community"
-  "good first issue:00FFFF:Good for newcomers"
-  "priority: high:FF0000:High priority item"
-  "priority: medium:FF9900:Medium priority item"
-  "priority: low:00FF00:Low priority item"
-  "wontfix:808080:Will not be fixed"
-  "duplicate:808080:Duplicate issue"
-  "invalid:808080:Invalid issue"
+  "bug|FF0000|Bug or issue with the code"
+  "enhancement|00FF00|New feature or enhancement"
+  "documentation|0066FF|Documentation improvements"
+  "question|FF9900|Question or discussion"
+  "help wanted|FF00FF|Help needed from the community"
+  "good first issue|00FFFF|Good for newcomers"
+  "priority-high|FF0000|High priority item"
+  "priority-medium|FF9900|Medium priority item"
+  "priority-low|00FF00|Low priority item"
+  "wontfix|808080|Will not be fixed"
+  "duplicate|808080|Duplicate issue"
+  "invalid|808080|Invalid issue"
 )
 
 echo "🚀 Setting up repositories in $ORG organization..."
@@ -39,7 +40,7 @@ for repo in "${REPOS[@]}"; do
   
   # Create labels
   for label in "${LABELS[@]}"; do
-    IFS=':' read -r name color desc <<< "$label"
+    IFS='|' read -r name color desc <<< "$label"
     gh label create "$name" \
       --repo "$ORG/$repo" \
       --color "$color" \
