@@ -1,0 +1,197 @@
+services:
+  # Infrastructure Services
+  postgres:
+    image: postgres:15-alpine
+    container_name: marketing-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-marketing}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketing_password}
+      POSTGRES_DB: ${POSTGRES_DB:-marketing_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-marketing}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - marketing-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: marketing-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - marketing-network
+
+  # AI Function Calling Server
+  xlam-server:
+    build:
+      context: ../services/xlam-server
+      dockerfile: docker/Dockerfile
+    container_name: marketing-xlam-server
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MODEL_BACKEND=${MODEL_BACKEND:-ollama}
+      - MODEL_NAME=${MODEL_NAME:-default}
+      - MODEL_BASE_URL=${MODEL_BASE_URL:-http://localhost:11434}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - marketing-network
+    profiles:
+      - services
+    volumes:
+      - xlam_data:/app/data
+
+  n8n:
+    build:
+      context: ../services/n8n-orchestration
+      dockerfile: docker/Dockerfile
+    container_name: marketing-n8n
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=${POSTGRES_USER:-marketing}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:-marketing_password}
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-admin}
+      - XLAM_SERVER_URL=http://xlam-server:8000
+      - CRM_TWENTY_URL=http://crm-twenty:3000
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      postgres:
+        condition: service_healthy
+      xlam-server:
+        condition: service_started
+    networks:
+      - marketing-network
+    profiles:
+      - services
+
+  crm-twenty:
+    build:
+      context: ../services/crm-twenty
+      dockerfile: docker/Dockerfile
+    container_name: marketing-crm-twenty
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-marketing}:${POSTGRES_PASSWORD:-marketing_password}@postgres:5432/twenty_db
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - marketing-network
+    profiles:
+      - services
+    volumes:
+      - crm_data:/app/data
+
+  mautic:
+    image: php:8.2-apache
+    container_name: marketing-mautic
+    command: sleep infinity
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${POSTGRES_USER:-marketing}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-marketing_password}
+      - DB_NAME=mautic_db
+    ports:
+      - "8080:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - marketing-network
+    profiles:
+      - services
+
+  lightdash:
+    image: lightdash/lightdash:latest
+    container_name: marketing-lightdash
+    environment:
+      - PGHOST=postgres
+      - PGPORT=5432
+      - PGDATABASE=lightdash_db
+      - PGUSER=${POSTGRES_USER:-marketing}
+      - PGPASSWORD=${POSTGRES_PASSWORD:-marketing_password}
+    ports:
+      - "3001:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - marketing-network
+    profiles:
+      - services
+
+  dashboard-streamlit:
+    build:
+      context: ../services/dashboard-streamlit
+      dockerfile: docker/Dockerfile
+    container_name: marketing-dashboard
+    environment:
+      - XLAM_SERVER_URL=http://xlam-server:8000
+      - N8N_URL=http://n8n:5678
+      - CRM_TWENTY_URL=http://crm-twenty:3000
+      - LIGHTDASH_URL=http://lightdash:3001
+    ports:
+      - "8501:8501"
+    depends_on:
+      - xlam-server
+      - n8n
+      - crm-twenty
+    networks:
+      - marketing-network
+    profiles:
+      - services
+    volumes:
+      - dashboard_data:/app/data
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  n8n_data:
+    driver: local
+  xlam_data:
+    driver: local
+  crm_data:
+    driver: local
+  dashboard_data:
+    driver: local
+
+networks:
+  marketing-network:
+    driver: bridge
+    name: marketing-network
+

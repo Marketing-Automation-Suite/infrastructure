@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: marketing-automation-quota
+  namespace: marketing-automation
+spec:
+  hard:
+    requests.cpu: "32"
+    requests.memory: 64Gi
+    limits.cpu: "64"
+    limits.memory: 128Gi
+    persistentvolumeclaims: "10"
+    services.loadbalancers: "5"
+

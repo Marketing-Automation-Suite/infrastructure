@@ -1,0 +1,22 @@
+[submodule "services/xlam-server"]
+	path = services/xlam-server
+	url = https://github.com/Marketing-Automation-Suite/xlam-server.git
+[submodule "services/n8n-orchestration"]
+	path = services/n8n-orchestration
+	url = https://github.com/Marketing-Automation-Suite/n8n-orchestration.git
+[submodule "services/crm-twenty"]
+	path = services/crm-twenty
+	url = https://github.com/Marketing-Automation-Suite/crm-twenty.git
+[submodule "services/mautic-integration"]
+	path = services/mautic-integration
+	url = https://github.com/Marketing-Automation-Suite/mautic-integration.git
+[submodule "services/analytics-lightdash"]
+	path = services/analytics-lightdash
+	url = https://github.com/Marketing-Automation-Suite/analytics-lightdash.git
+[submodule "services/dashboard-streamlit"]
+	path = services/dashboard-streamlit
+	url = https://github.com/Marketing-Automation-Suite/dashboard-streamlit.git
+[submodule "services/shared-libraries"]
+	path = services/shared-libraries
+	url = https://github.com/Marketing-Automation-Suite/shared-libraries.git
+

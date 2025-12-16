@@ -1,0 +1,40 @@
+name: Infrastructure Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-docker-compose:
+    name: Validate Docker Compose
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Validate docker-compose.yml
+        run: |
+          cd docker
+          docker compose config --quiet
+          
+      - name: Check for syntax errors
+        run: |
+          cd docker
+          docker compose config > /dev/null
+
+  validate-scripts:
+    name: Validate Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check script syntax
+        run: |
+          shellcheck scripts/*.sh || true
+          
+      - name: Verify scripts are executable
+        run: |
+          test -x scripts/setup-dev.sh
+          test -x scripts/update-all.sh
+

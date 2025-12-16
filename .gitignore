@@ -1,0 +1,31 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+docker/.env.global
+
+# Service directories (git submodules)
+services/
+
+# Docker volumes
+docker/volumes/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+
