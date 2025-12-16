@@ -1,0 +1,62 @@
+id: mailgun
+name: Mailgun
+category: email
+description: Mailgun email API for transactional emails, email validation, and analytics
+icon_url: https://www.mailgun.com/favicon.ico
+connector_class: MailgunConnector
+is_active: true
+popularity_score: 85
+
+required_credentials:
+  - api_key
+  - domain
+
+optional_credentials:
+  - public_api_key
+
+test_endpoint:
+  url: https://api.mailgun.net/v3/{domain}
+  method: GET
+  auth_type: basic
+
+configuration_steps:
+  - step: 1
+    title: Create Mailgun Account
+    description: Sign up for a Mailgun account
+    link: https://signup.mailgun.com
+    instructions: |
+      1. Visit https://signup.mailgun.com
+      2. Create an account
+      3. Verify your email
+  
+  - step: 2
+    title: Add and Verify Domain
+    description: Add your sending domain to Mailgun
+    link: https://app.mailgun.com/app/sending/domains
+    instructions: |
+      1. Go to Sending > Domains
+      2. Click "Add New Domain"
+      3. Enter your domain
+      4. Add DNS records as instructed
+      5. Verify domain
+  
+  - step: 3
+    title: Get API Key
+    description: Copy your API key from dashboard
+    link: https://app.mailgun.com/app/account/security/api_keys
+    instructions: |
+      1. Go to Account > Security > API Keys
+      2. Copy your Private API key
+      3. Save it securely
+
+capabilities:
+  - send_email
+  - send_bulk_email
+  - manage_contacts
+  - track_events
+  - validate_emails
+
+pricing_info:
+  type: usage_based
+  note: Free tier available (5,000 emails/month for 3 months)
+

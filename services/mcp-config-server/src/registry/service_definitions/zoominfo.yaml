@@ -1,0 +1,50 @@
+id: zoominfo
+name: ZoomInfo
+category: lead_generation
+description: ZoomInfo B2B contact and company database for lead generation
+icon_url: https://www.zoominfo.com/favicon.ico
+connector_class: ZoomInfoConnector
+is_active: true
+popularity_score: 82
+
+required_credentials:
+  - username
+  - password
+
+optional_credentials:
+  - api_key
+
+test_endpoint:
+  url: https://api.zoominfo.com/search/contact
+  method: GET
+  auth_type: basic
+
+configuration_steps:
+  - step: 1
+    title: Get ZoomInfo Account
+    description: Contact ZoomInfo for API access
+    link: https://www.zoominfo.com/contact
+    instructions: |
+      1. ZoomInfo requires enterprise account
+      2. Contact sales for API access
+      3. Request API credentials
+  
+  - step: 2
+    title: Configure API Access
+    description: Set up API username and password
+    instructions: |
+      1. Receive API credentials from ZoomInfo
+      2. Use provided username and password
+      3. Save credentials securely
+
+capabilities:
+  - search_contacts
+  - search_companies
+  - enrich_profiles
+  - find_decision_makers
+  - get_company_intelligence
+
+pricing_info:
+  type: enterprise
+  note: Enterprise pricing, contact sales
+

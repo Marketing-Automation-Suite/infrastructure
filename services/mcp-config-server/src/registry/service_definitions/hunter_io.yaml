@@ -1,0 +1,47 @@
+id: hunter_io
+name: Hunter.io
+category: data_enrichment
+description: Hunter.io email finder and verifier for finding and validating email addresses
+icon_url: https://hunter.io/favicon.ico
+connector_class: HunterIOConnector
+is_active: true
+popularity_score: 80
+
+required_credentials:
+  - api_key
+
+test_endpoint:
+  url: https://api.hunter.io/v2/account
+  method: GET
+  auth_type: query_param
+
+configuration_steps:
+  - step: 1
+    title: Create Hunter.io Account
+    description: Sign up for a Hunter.io account
+    link: https://hunter.io/users/sign_up
+    instructions: |
+      1. Visit https://hunter.io/users/sign_up
+      2. Create a free or paid account
+      3. Verify your email
+  
+  - step: 2
+    title: Get API Key
+    description: Copy your API key from dashboard
+    link: https://hunter.io/user/api_keys
+    instructions: |
+      1. Log in to Hunter.io
+      2. Go to Account > API Keys
+      3. Copy your API key
+      4. Save it securely
+
+capabilities:
+  - verify_email
+  - find_emails
+  - enrich_domain
+  - check_deliverability
+
+pricing_info:
+  type: usage_based
+  note: Free tier available (25 searches/month)
+

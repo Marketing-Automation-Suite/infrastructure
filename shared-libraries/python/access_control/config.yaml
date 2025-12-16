@@ -1,0 +1,35 @@
+tiers:
+  free:
+    max_contacts: 100
+    max_workflows: 5
+    api_calls_per_day: 100
+    features:
+      - basic_dashboard
+      - basic_analytics
+  
+  bronze:
+    max_contacts: 1000
+    max_workflows: 20
+    api_calls_per_day: 1000
+    features:
+      - advanced_analytics
+      - api_access
+  
+  silver:
+    max_contacts: 10000
+    max_workflows: -1  # unlimited
+    api_calls_per_day: 10000
+    features:
+      - unlimited_workflows
+      - api_access
+      - webhooks
+  
+  gold:
+    max_contacts: -1  # unlimited
+    max_workflows: -1
+    api_calls_per_day: -1  # unlimited
+    features:
+      - all_features
+      - white_label
+      - custom_integrations
+

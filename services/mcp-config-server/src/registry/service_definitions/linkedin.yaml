@@ -1,0 +1,59 @@
+id: linkedin
+name: LinkedIn Sales Navigator
+category: lead_generation
+description: Access LinkedIn Sales Navigator API for lead generation, profile enrichment, and messaging
+icon_url: https://cdn-icons-png.flaticon.com/512/174/174857.png
+connector_class: LinkedInConnector
+is_active: true
+popularity_score: 95
+
+required_credentials:
+  - api_key
+  - api_secret
+
+optional_credentials:
+  - access_token
+
+test_endpoint:
+  url: https://api.linkedin.com/v2/me
+  method: GET
+  auth_type: oauth2
+
+configuration_steps:
+  - step: 1
+    title: Create LinkedIn App
+    description: Go to LinkedIn Developers and create a new app
+    link: https://www.linkedin.com/developers/apps
+    instructions: |
+      1. Visit https://www.linkedin.com/developers/apps
+      2. Click "Create app"
+      3. Fill in app details
+      4. Submit for review if needed
+  
+  - step: 2
+    title: Get API Credentials
+    description: Copy your Client ID (API Key) and Client Secret
+    instructions: |
+      1. In your app dashboard, go to "Auth" tab
+      2. Copy the "Client ID" (this is your API Key)
+      3. Copy the "Client Secret" (this is your API Secret)
+  
+  - step: 3
+    title: Configure OAuth Redirect
+    description: Set up OAuth redirect URL for access token generation
+    instructions: |
+      1. Add redirect URL in Auth tab
+      2. Request necessary permissions (r_liteprofile, r_emailaddress, w_messages)
+      3. Save changes
+
+capabilities:
+  - generate_leads
+  - enrich_profiles
+  - send_messages
+  - search_people
+  - get_company_info
+
+pricing_info:
+  type: subscription
+  note: Requires LinkedIn Sales Navigator subscription
+

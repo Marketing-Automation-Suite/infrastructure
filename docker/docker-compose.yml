@@ -163,18 +163,157 @@ services:
       - N8N_URL=http://n8n:5678
       - CRM_TWENTY_URL=http://crm-twenty:3000
       - LIGHTDASH_URL=http://lightdash:3001
+      - AUTH_SERVICE_URL=http://auth-service:8001
+      - TOKEN_VERIFICATION_URL=http://token-verification-service:8002
+      - PAYMENT_SERVICE_URL=http://payment-service:8003
     ports:
       - "8501:8501"
     depends_on:
       - xlam-server
       - n8n
       - crm-twenty
+      - auth-service
+      - token-verification-service
     networks:
       - marketing-network
     profiles:
       - services
     volumes:
       - dashboard_data:/app/data
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ../services/auth-service
+      dockerfile: docker/Dockerfile
+    container_name: marketing-auth-service
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-marketing}:${POSTGRES_PASSWORD:-marketing_password}@postgres:5432/${AUTH_DB_NAME:-auth_db}
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - JWT_EXPIRATION_HOURS=24
+      - REDIS_URL=redis://redis:6379/0
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - marketing-network
+    profiles:
+      - services
+
+  # Token Verification Service
+  token-verification-service:
+    build:
+      context: ../services/token-verification-service
+      dockerfile: docker/Dockerfile
+    container_name: marketing-token-verification
+    environment:
+      - ETHEREUM_RPC_URL=${ETHEREUM_RPC_URL:-https://rpc.sepolia.org}
+      - POLYGON_RPC_URL=${POLYGON_RPC_URL:-https://rpc-mumbai.maticvigil.com}
+      - ARBITRUM_RPC_URL=${ARBITRUM_RPC_URL:-https://goerli-rollup.arbitrum.io/rpc}
+      - LICENSE_TOKEN_CONTRACT_ETHEREUM=${LICENSE_TOKEN_CONTRACT_ETHEREUM:-}
+      - LICENSE_TOKEN_CONTRACT_POLYGON=${LICENSE_TOKEN_CONTRACT_POLYGON:-}
+      - LICENSE_TOKEN_CONTRACT_ARBITRUM=${LICENSE_TOKEN_CONTRACT_ARBITRUM:-}
+      - REDIS_URL=redis://redis:6379/1
+    ports:
+      - "8002:8002"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - marketing-network
+    profiles:
+      - services
+
+  # Payment Service
+  payment-service:
+    build:
+      context: ../services/payment-service
+      dockerfile: docker/Dockerfile
+    container_name: marketing-payment-service
+    environment:
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - LICENSE_TOKEN_CONTRACT_ETHEREUM=${LICENSE_TOKEN_CONTRACT_ETHEREUM:-}
+      - LICENSE_TOKEN_CONTRACT_POLYGON=${LICENSE_TOKEN_CONTRACT_POLYGON:-}
+      - LICENSE_TOKEN_CONTRACT_ARBITRUM=${LICENSE_TOKEN_CONTRACT_ARBITRUM:-}
+      - AUTH_SERVICE_URL=http://auth-service:8001
+    ports:
+      - "8003:8003"
+    depends_on:
+      - auth-service
+    networks:
+      - marketing-network
+    profiles:
+      - services
+
+  # MCP Configuration Server
+  mcp-config-server:
+    build:
+      context: ../services/mcp-config-server
+      dockerfile: docker/Dockerfile
+    container_name: marketing-mcp-config
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-marketing}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-marketing_password}
+      - MCP_DB_NAME=mcp_config_db
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-marketing}:${POSTGRES_PASSWORD:-marketing_password}@postgres:5432/mcp_config_db
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-}
+    ports:
+      - "8004:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - marketing-network
+    profiles:
+      - services
+    volumes:
+      - mcp_config_data:/app/data
+
+  nft-software-engine:
+    build:
+      context: ../services/nft-software-engine
+      dockerfile: docker/Dockerfile
+    container_name: marketing-nft-engine
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-marketing}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-marketing_password}
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=nft_engine
+      - DATABASE_USERNAME=${POSTGRES_USER:-marketing}
+      - DATABASE_PASSWORD=${POSTGRES_PASSWORD:-marketing_password}
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-marketing}:${POSTGRES_PASSWORD:-marketing_password}@postgres:5432/nft_engine
+      - HOST=0.0.0.0
+      - PORT=8000
+      - WEB3_PROVIDER_URL=${WEB3_PROVIDER_URL:-https://polygon-rpc.com}
+      - NETWORK=${NETWORK:-polygon}
+      - CURRENCY=${CURRENCY:-MATIC}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:8501,http://localhost:3000}
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-change-me-in-production}
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    ports:
+      - "8002:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - marketing-network
+    profiles:
+      - services
+    volumes:
+      - nft_engine_data:/app/cache
 
 volumes:
   postgres_data:
@@ -188,6 +327,10 @@ volumes:
   crm_data:
     driver: local
   dashboard_data:
+    driver: local
+  mcp_config_data:
+    driver: local
+  nft_engine_data:
     driver: local
 
 networks:
