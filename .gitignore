@@ -5,7 +5,9 @@
 docker/.env.global
 
 # Service directories (git submodules)
-services/
+# Note: services/ subdirectories are tracked as git submodules
+# Only ignore if submodules are not initialized
+# services/
 
 # Docker volumes
 docker/volumes/
