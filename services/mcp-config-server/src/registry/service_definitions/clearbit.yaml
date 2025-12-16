@@ -1,0 +1,48 @@
+id: clearbit
+name: Clearbit
+category: data_enrichment
+description: Clearbit data enrichment API for person and company data
+icon_url: https://clearbit.com/favicon.ico
+connector_class: ClearbitConnector
+is_active: true
+popularity_score: 75
+
+required_credentials:
+  - api_key
+
+test_endpoint:
+  url: https://person.clearbit.com/v2/combined/find
+  method: GET
+  auth_type: bearer
+
+configuration_steps:
+  - step: 1
+    title: Create Clearbit Account
+    description: Sign up for a Clearbit account
+    link: https://dashboard.clearbit.com/signup
+    instructions: |
+      1. Visit https://dashboard.clearbit.com/signup
+      2. Create an account
+      3. Verify your email
+  
+  - step: 2
+    title: Get API Key
+    description: Copy your API key from dashboard
+    link: https://dashboard.clearbit.com/api
+    instructions: |
+      1. Log in to Clearbit dashboard
+      2. Go to Settings > API
+      3. Copy your API key
+      4. Save it securely
+
+capabilities:
+  - enrich_person
+  - enrich_company
+  - enrich_domain
+  - find_company
+  - discover_company
+
+pricing_info:
+  type: usage_based
+  note: Free tier available (limited requests)
+

@@ -1,0 +1,54 @@
+id: sendgrid
+name: SendGrid
+category: email
+description: SendGrid email delivery service for transactional and marketing emails
+icon_url: https://sendgrid.com/favicon.ico
+connector_class: SendGridConnector
+is_active: true
+popularity_score: 90
+
+required_credentials:
+  - api_key
+
+optional_credentials:
+  - api_key_id
+
+test_endpoint:
+  url: https://api.sendgrid.com/v3/user/profile
+  method: GET
+  auth_type: bearer
+
+configuration_steps:
+  - step: 1
+    title: Create SendGrid Account
+    description: Sign up for a SendGrid account
+    link: https://signup.sendgrid.com
+    instructions: |
+      1. Visit https://signup.sendgrid.com
+      2. Create a free or paid account
+      3. Verify your email address
+  
+  - step: 2
+    title: Generate API Key
+    description: Create an API key in SendGrid dashboard
+    link: https://app.sendgrid.com/settings/api_keys
+    instructions: |
+      1. Log in to SendGrid dashboard
+      2. Go to Settings > API Keys
+      3. Click "Create API Key"
+      4. Give it a name (e.g., "Marketing Automation")
+      5. Select "Full Access" or appropriate permissions
+      6. Copy the API key (you won't see it again!)
+
+capabilities:
+  - send_email
+  - send_bulk_email
+  - manage_contacts
+  - create_campaigns
+  - track_opens
+  - track_clicks
+
+pricing_info:
+  type: usage_based
+  note: Free tier available (100 emails/day)
+

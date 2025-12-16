@@ -176,6 +176,31 @@ services:
     volumes:
       - dashboard_data:/app/data
 
+  mcp-config-server:
+    build:
+      context: ../services/mcp-config-server
+      dockerfile: docker/Dockerfile
+    container_name: marketing-mcp-config
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-marketing}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-marketing_password}
+      - MCP_DB_NAME=mcp_config_db
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-marketing}:${POSTGRES_PASSWORD:-marketing_password}@postgres:5432/mcp_config_db
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-}
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - marketing-network
+    profiles:
+      - services
+    volumes:
+      - mcp_config_data:/app/data
+
 volumes:
   postgres_data:
     driver: local
@@ -188,6 +213,8 @@ volumes:
   crm_data:
     driver: local
   dashboard_data:
+    driver: local
+  mcp_config_data:
     driver: local
 
 networks:
