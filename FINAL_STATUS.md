@@ -99,12 +99,14 @@
 5. ✅ **mautic-integration** - Marketing automation
 6. ✅ **analytics-lightdash** - Business intelligence
 7. ✅ **dashboard-streamlit** - Commander's Console
-8. ✅ **shared-libraries** - Common code and API clients
+8. ✅ **mcp-config-server** - MCP configuration and service marketplace
+9. ✅ **nft-software-engine** - NFT-based software licensing system
+10. ✅ **shared-libraries** - Common code and API clients
 
 ## 📊 Implementation Statistics
 
-- **Total Files:** 82+
-- **Services:** 8 repositories
+- **Total Files:** 90+
+- **Services:** 10 repositories
 - **Docker Configs:** Complete
 - **Kubernetes Manifests:** Complete (development & production)
 - **Documentation:** Comprehensive

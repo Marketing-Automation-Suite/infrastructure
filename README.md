@@ -23,7 +23,7 @@ docker compose up -d
 
 ## Repository Structure
 
-This repository orchestrates all 10 service repositories:
+This repository orchestrates all 11 service repositories:
 
 - **infrastructure** (this repo) - Orchestration and deployment
 - **xlam-server** - AI function calling service (model-agnostic)
@@ -32,6 +32,8 @@ This repository orchestrates all 10 service repositories:
 - **mautic-integration** - Marketing automation
 - **analytics-lightdash** - Business intelligence
 - **dashboard-streamlit** - Commander's Console
+- **mcp-config-server** - MCP configuration and service marketplace
+- **nft-software-engine** - NFT-based software licensing system
 - **shared-libraries** - Common code (jarvis_core)
 
 ## Architecture

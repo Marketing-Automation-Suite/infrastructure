@@ -2,12 +2,14 @@
 MCP Configuration Server - FastAPI Application
 """
 
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, Security
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import APIKeyHeader
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 import logging
+import os
 from datetime import datetime
 
 from .database.connection import get_db, init_db
@@ -25,14 +27,57 @@ app = FastAPI(
     description="Service marketplace and configuration system for external marketing services"
 )
 
-# CORS middleware
+# CORS configuration - SECURITY FIX
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "")
+if allowed_origins_str:
+    allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
+else:
+    # Development fallback - warn but allow
+    allowed_origins = ["*"]
+    if os.getenv("ENVIRONMENT") == "production":
+        logger.error("ALLOWED_ORIGINS must be set in production!")
+        raise ValueError("ALLOWED_ORIGINS environment variable must be set in production")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Content-Type", "Authorization", "X-API-Key"],
 )
+
+# API Key Authentication
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+async def verify_api_key(api_key: Optional[str] = Security(api_key_header)):
+    """
+    Verify API key for authentication.
+    In production, this should integrate with auth-service.
+    """
+    # Check if authentication is enabled
+    if os.getenv("DISABLE_AUTH", "false").lower() == "true":
+        logger.warning("Authentication is DISABLED - not recommended for production")
+        return True
+    
+    # Get expected API key from environment
+    expected_key = os.getenv("API_KEY")
+    if not expected_key:
+        if os.getenv("ENVIRONMENT") == "production":
+            raise HTTPException(
+                status_code=500,
+                detail="API_KEY not configured - server misconfiguration"
+            )
+        # Development mode - allow without key
+        logger.warning("API_KEY not set - allowing unauthenticated access (dev only)")
+        return True
+    
+    if not api_key or api_key != expected_key:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid or missing API key"
+        )
+    
+    return True
 
 # Initialize on startup
 @app.on_event("startup")
@@ -89,7 +134,8 @@ async def liveness():
 @app.get("/mcp/marketplace", response_model=MCPResponse)
 async def get_marketplace(
     category: Optional[str] = None,
-    search: Optional[str] = None
+    search: Optional[str] = None,
+    _: bool = Depends(verify_api_key)
 ):
     """Get marketplace of available services"""
     try:
@@ -110,7 +156,10 @@ async def get_marketplace(
 
 
 @app.get("/mcp/tools/discover_services", response_model=MCPResponse)
-async def discover_services(category: str = "all"):
+async def discover_services(
+    category: str = "all",
+    _: bool = Depends(verify_api_key)
+):
     """Discover available services by category"""
     try:
         registry = get_registry()
@@ -127,7 +176,10 @@ async def discover_services(category: str = "all"):
 
 
 @app.get("/mcp/tools/get_service_info", response_model=MCPResponse)
-async def get_service_info(service_name: str):
+async def get_service_info(
+    service_name: str,
+    _: bool = Depends(verify_api_key)
+):
     """Get detailed information about a service"""
     try:
         registry = get_registry()
@@ -154,7 +206,8 @@ async def get_service_info(service_name: str):
 @app.post("/mcp/tools/configure_service", response_model=MCPResponse)
 async def configure_service(
     request: ServiceConfigurationRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_api_key)
 ):
     """Configure a service with credentials"""
     try:
@@ -241,7 +294,8 @@ async def configure_service(
 async def test_service_connection(
     service_name: str,
     config_id: Optional[int] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_api_key)
 ):
     """Test connection to a configured service"""
     try:
@@ -311,7 +365,10 @@ async def test_service_connection(
 
 
 @app.get("/mcp/tools/list_configured_services", response_model=MCPResponse)
-async def list_configured_services(db: Session = Depends(get_db)):
+async def list_configured_services(
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_api_key)
+):
     """List all configured services"""
     try:
         configs = db.query(ServiceConfiguration).all()
@@ -341,7 +398,8 @@ async def list_configured_services(db: Session = Depends(get_db)):
 async def update_service_config(
     service_name: str,
     request: ServiceUpdateRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_api_key)
 ):
     """Update service configuration"""
     try:
@@ -383,7 +441,10 @@ async def update_service_config(
 
 
 @app.get("/mcp/tools/get_configuration_guide", response_model=MCPResponse)
-async def get_configuration_guide(service_name: str):
+async def get_configuration_guide(
+    service_name: str,
+    _: bool = Depends(verify_api_key)
+):
     """Get step-by-step configuration guide for a service"""
     try:
         registry = get_registry()
@@ -420,7 +481,8 @@ async def get_configuration_guide(service_name: str):
 async def search_marketplace(
     use_case: Optional[str] = None,
     integration_type: Optional[str] = None,
-    category: Optional[str] = None
+    category: Optional[str] = None,
+    _: bool = Depends(verify_api_key)
 ):
     """Search marketplace for services"""
     try:

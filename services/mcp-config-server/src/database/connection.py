@@ -6,7 +6,6 @@ import os
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import NullPool
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,10 +16,17 @@ DATABASE_URL = os.getenv(
     f"postgresql://{os.getenv('POSTGRES_USER', 'marketing')}:{os.getenv('POSTGRES_PASSWORD', 'marketing_password')}@{os.getenv('POSTGRES_HOST', 'postgres')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('MCP_DB_NAME', 'mcp_config_db')}"
 )
 
-# Create engine
+# Create engine with connection pooling
+# SECURITY FIX: Enable connection pooling for better performance and resource management
+pool_size = int(os.getenv("DB_POOL_SIZE", "10"))
+max_overflow = int(os.getenv("DB_MAX_OVERFLOW", "20"))
+
 engine = create_engine(
     DATABASE_URL,
-    poolclass=NullPool,
+    pool_size=pool_size,
+    max_overflow=max_overflow,
+    pool_pre_ping=True,  # Verify connections before using
+    pool_recycle=3600,   # Recycle connections after 1 hour
     echo=os.getenv("SQL_DEBUG", "false").lower() == "true"
 )
 

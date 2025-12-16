@@ -1,0 +1,134 @@
+# NFT Software Engine - Kubernetes ConfigMap and Secrets
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nft-software-engine-config
+  namespace: marketing-automation
+  labels:
+    app: nft-software-engine
+data:
+  # Application Configuration
+  app-name: "NFT Software Engine"
+  app-version: "1.0.0"
+  debug: "false"
+  log-level: "INFO"
+  
+  # Server Configuration
+  host: "0.0.0.0"
+  port: "8000"
+  
+  # Blockchain Configuration
+  network: "polygon"
+  currency: "MATIC"
+  web3-provider-url: "https://polygon-rpc.com"
+  
+  # CORS Configuration
+  allowed-origins: "https://dashboard.marketing-automation.com,https://app.marketing-automation.com"
+  
+  # Rate Limiting
+  rate-limit-requests: "100"
+  rate-limit-window: "60"
+  
+  # Database Configuration (non-sensitive)
+  database-host: "postgresql.marketing-automation.svc.cluster.local"
+  database-port: "5432"
+  database-name: "nft_engine"
+  
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nft-software-engine-secrets
+  namespace: marketing-automation
+  labels:
+    app: nft-software-engine
+type: Opaque
+data:
+  # Base64 encoded values - replace with actual secure values
+  # Generate using: echo -n 'your-secret' | base64
+  
+  # Database Configuration
+  database-url: cG9zdGdyZXNxbDovL3VzZXI6cGFzc3dvcmRAcG9zdGdyZXNxbC5tYXJrZXRpbmcuYXV0b21hdGlvbi5zdmMuY2x1c3Rlci5sb2NhbDo1NDMyL25mdF9lbmdpbmU=
+  database-username: dXNlcg==
+  database-password: cGFzc3dvcmQ=
+  
+  # Security Configuration
+  secret-key: eW91ci1zdXBlci1zZWN1cmUtc2VjcmV0LWtleS1ub3QtdmFsaWQ=
+  encryption-key: eW91ci1lbmNyeXB0aW9uLWtleS1ub3QtdmFsaWQ=
+  
+  # JWT Configuration
+  jwt-secret: eW91ci1qd3Qtc2VjcmV0LW5vdC12YWxpZA==
+  jwt-algorithm: HS256
+  
+  # Blockchain Configuration (sensitive)
+  private-key: eW91ci1wcml2YXRlLWJsb2NrY2hhaW4ta2V5LW5vdC12YWxpZA==
+  
+  # External Service API Keys (if needed)
+  infura-project-id: eW91ci1pbmZ1cmEtcHJvamVjdC1pZA==
+  alchemy-api-key: eW91ci1hbGNoZW15LWFwaS1rZXk=
+  
+  # Monitoring
+  sentry-dsn: eW91ci1zZW50cnktZHNu
+  
+  # Email Configuration (if needed)
+  smtp-host: eW91ci1zbXRwLWhvc3Q=
+  smtp-username: eW91ci1zbXRwLXVzZXI=
+  smtp-password: eW91ci1zbXRwLXBhc3M=
+  smtp-port: "NTI1"
+
+---
+# ServiceAccount for pod access
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nft-software-engine
+  namespace: marketing-automation
+  labels:
+    app: nft-software-engine
+
+---
+# Network Policy for security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: nft-software-engine-network-policy
+  namespace: marketing-automation
+spec:
+  podSelector:
+    matchLabels:
+      app: nft-software-engine
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8000
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: marketing-automation
+    ports:
+    - protocol: TCP
+      port: 5432  # PostgreSQL
+    - protocol: TCP
+      port: 6379  # Redis (if used)
+  - to:
+    - namespaceSelector: {}  # Allow external
+    ports:
+    - protocol: TCP
+      port: 443   # HTTPS
+    - protocol: TCP
+      port: 80    # HTTP
+    - protocol: TCP
+      port: 8545  # Ethereum RPC
+    - protocol: TCP
+      port: 8546  # Ethereum WebSocket
