@@ -15,42 +15,54 @@ engine = None
 SessionLocal = None
 
 
-def init_db(database_url: str = None):
-    """Initialize database connection and create tables"""
-    global engine, SessionLocal
+async def init_db(database_url: str = None):
+    """Initialize database connection and create tables (async wrapper)"""
+    import asyncio
     
-    if not database_url:
-        from ..config.settings import settings
-        database_url = settings.DATABASE_URL
+    def _init_db_sync(db_url: str):
+        """Synchronous database initialization"""
+        global engine, SessionLocal
+        
+        if not db_url:
+            from ..config.settings import settings
+            db_url = settings.DATABASE_URL
+        
+        try:
+            # Create engine based on database URL
+            if "sqlite" in db_url:
+                engine = create_engine(
+                    db_url,
+                    connect_args={"check_same_thread": False},
+                    poolclass=StaticPool,
+                    echo=settings.DEBUG if hasattr(settings, 'DEBUG') else False
+                )
+            else:
+                engine = create_engine(
+                    db_url,
+                    pool_pre_ping=True,
+                    pool_recycle=300,
+                    echo=settings.DEBUG if hasattr(settings, 'DEBUG') else False
+                )
+            
+            # Create session maker
+            SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+            
+            # Create all tables
+            Base.metadata.create_all(bind=engine)
+            
+            logger.info(f"Database initialized successfully: {db_url}")
+            
+        except Exception as e:
+            logger.error(f"Failed to initialize database: {e}")
+            raise
     
+    # Run synchronous database initialization in thread pool
     try:
-        # Create engine based on database URL
-        if "sqlite" in database_url:
-            engine = create_engine(
-                database_url,
-                connect_args={"check_same_thread": False},
-                poolclass=StaticPool,
-                echo=settings.DEBUG if hasattr(settings, 'DEBUG') else False
-            )
-        else:
-            engine = create_engine(
-                database_url,
-                pool_pre_ping=True,
-                pool_recycle=300,
-                echo=settings.DEBUG if hasattr(settings, 'DEBUG') else False
-            )
-        
-        # Create session maker
-        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-        
-        # Create all tables
-        Base.metadata.create_all(bind=engine)
-        
-        logger.info(f"Database initialized successfully: {database_url}")
-        
-    except Exception as e:
-        logger.error(f"Failed to initialize database: {e}")
-        raise
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    await loop.run_in_executor(None, _init_db_sync, database_url)
 
 
 def get_db() -> Session:

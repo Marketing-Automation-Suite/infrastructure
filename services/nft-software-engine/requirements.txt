@@ -23,7 +23,7 @@ aiohttp==3.9.1
 
 # Authentication & Security
 python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
+# Note: Using hashlib.pbkdf2_hmac directly instead of passlib (outdated, last updated 2020)
 python-multipart==0.0.6
 
 # Caching & Rate Limiting

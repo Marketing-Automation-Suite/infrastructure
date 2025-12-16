@@ -6,25 +6,34 @@ import logging
 from typing import Optional, Dict, Any
 from fastapi import HTTPException, status
 from jose import jwt, JWTError
-from passlib.context import CryptContext
+import hashlib
+import secrets
 import httpx
 
 from ..config.settings import settings
 
 logger = logging.getLogger(__name__)
 
-# Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
+# Password hashing - use PBKDF2 directly to avoid passlib/bcrypt issues
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash"""
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        # Format: salt:hash (both hex encoded)
+        salt_hex, hash_hex = hashed_password.split(':')
+        salt = bytes.fromhex(salt_hex)
+        # Hash the provided password with the same salt
+        new_hash = hashlib.pbkdf2_hmac('sha256', plain_password.encode(), salt, 100000)
+        return new_hash.hex() == hash_hex
+    except Exception:
+        return False
 
 
 def get_password_hash(password: str) -> str:
-    """Hash a password"""
-    return pwd_context.hash(password)
+    """Hash a password using PBKDF2"""
+    salt = secrets.token_bytes(16)
+    hash_value = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100000)
+    # Return format: salt:hash (both hex encoded)
+    return f"{salt.hex()}:{hash_value.hex()}"
 
 
 async def verify_token(token: str) -> Optional[Dict[str, Any]]:
