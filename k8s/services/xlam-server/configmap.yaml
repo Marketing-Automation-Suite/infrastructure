@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: xlam-config
+  namespace: marketing-automation
+data:
+  model_backend: "ollama"
+  model_name: "default"
+  model_base_url: "http://ollama:11434"
+  tool_format: "json"
+  use_raw_mode: "false"
+

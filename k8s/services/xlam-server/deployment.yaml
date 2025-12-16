@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xlam-server
+  namespace: marketing-automation
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: xlam-server
+  template:
+    metadata:
+      labels:
+        app: xlam-server
+    spec:
+      containers:
+      - name: xlam-server
+        image: marketing-automation-suite/xlam-server:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: POSTGRES_HOST
+          value: postgres
+        - name: REDIS_HOST
+          value: redis
+        - name: MODEL_BACKEND
+          valueFrom:
+            configMapKeyRef:
+              name: xlam-config
+              key: model_backend
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+

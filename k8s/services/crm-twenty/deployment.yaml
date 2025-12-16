@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crm-twenty
+  namespace: marketing-automation
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: crm-twenty
+  template:
+    metadata:
+      labels:
+        app: crm-twenty
+    spec:
+      containers:
+      - name: crm-twenty
+        image: marketing-automation-suite/crm-twenty:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: crm-secrets
+              key: database_url
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+
