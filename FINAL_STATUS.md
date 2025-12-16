@@ -92,21 +92,29 @@
 
 ## 📦 Complete Service List
 
-1. ✅ **infrastructure** - Orchestration and deployment
-2. ✅ **xlam-server** - AI function calling (model-agnostic)
-3. ✅ **n8n-orchestration** - Workflow orchestration
-4. ✅ **crm-twenty** - Modern CRM
-5. ✅ **mautic-integration** - Marketing automation
-6. ✅ **analytics-lightdash** - Business intelligence
-7. ✅ **dashboard-streamlit** - Commander's Console
+### Submodule Repositories (7)
+1. ✅ **xlam-server** - AI function calling (model-agnostic)
+2. ✅ **n8n-orchestration** - Workflow orchestration
+3. ✅ **crm-twenty** - Modern CRM
+4. ✅ **mautic-integration** - Marketing automation
+5. ✅ **analytics-lightdash** - Business intelligence
+6. ✅ **dashboard-streamlit** - Commander's Console
+7. ✅ **shared-libraries** - Common code and API clients
+
+### Services in Infrastructure Repo (5)
 8. ✅ **mcp-config-server** - MCP configuration and service marketplace
 9. ✅ **nft-software-engine** - NFT-based software licensing system
-10. ✅ **shared-libraries** - Common code and API clients
+10. ✅ **auth-service** - Authentication and JWT token management
+11. ✅ **token-verification-service** - Blockchain token verification
+12. ✅ **payment-service** - Payment processing and subscription management
+
+### Infrastructure
+13. ✅ **infrastructure** - Orchestration and deployment
 
 ## 📊 Implementation Statistics
 
 - **Total Files:** 90+
-- **Services:** 10 repositories
+- **Services:** 12 service repositories (7 submodules + 5 in infrastructure)
 - **Docker Configs:** Complete
 - **Kubernetes Manifests:** Complete (development & production)
 - **Documentation:** Comprehensive
