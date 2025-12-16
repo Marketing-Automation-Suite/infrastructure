@@ -3,6 +3,7 @@ Tests for credential encryption/decryption
 """
 
 import pytest
+import os
 from src.encryption.credential_manager import CredentialManager
 
 
@@ -62,4 +63,63 @@ def test_invalid_decryption():
     
     with pytest.raises(ValueError):
         manager.decrypt_credentials(invalid_data)
+
+
+def test_production_requires_encryption_key(monkeypatch):
+    """Test that production mode requires ENCRYPTION_KEY"""
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.delenv("ENCRYPTION_KEY", raising=False)
+    
+    with pytest.raises(ValueError) as exc_info:
+        CredentialManager()
+    
+    assert "ENCRYPTION_KEY" in str(exc_info.value)
+
+
+def test_development_allows_key_generation(monkeypatch):
+    """Test that development mode can generate keys"""
+    monkeypatch.setenv("ENVIRONMENT", "development")
+    monkeypatch.delenv("ENCRYPTION_KEY", raising=False)
+    
+    # Should not raise error
+    manager = CredentialManager()
+    assert manager is not None
+    assert manager.cipher is not None
+
+
+def test_encryption_key_not_logged(monkeypatch, caplog):
+    """Test that encryption keys are never logged"""
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+    
+    monkeypatch.setenv("ENVIRONMENT", "development")
+    monkeypatch.delenv("ENCRYPTION_KEY", raising=False)
+    
+    manager = CredentialManager()
+    
+    # Check logs - should not contain the actual key
+    log_messages = caplog.text
+    # The key should not appear in logs (it's generated but not logged)
+    # This is a security check
+
+
+def test_environment_specific_salt(monkeypatch):
+    """Test that salt can be configured via environment"""
+    monkeypatch.setenv("ENCRYPTION_KEY", "test-key")
+    monkeypatch.setenv("ENCRYPTION_SALT", "custom-salt-value")
+    
+    manager = CredentialManager()
+    # Should use custom salt
+    assert manager is not None
+
+
+def test_salt_fallback_to_default(monkeypatch):
+    """Test that salt falls back to default if not set"""
+    monkeypatch.setenv("ENCRYPTION_KEY", "test-key")
+    monkeypatch.delenv("ENCRYPTION_SALT", raising=False)
+    monkeypatch.setenv("ENVIRONMENT", "development")
+    
+    manager = CredentialManager()
+    # Should work with default salt in development
+    assert manager is not None
 

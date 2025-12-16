@@ -49,21 +49,29 @@ class CredentialManager:
             Encryption key as bytes
         """
         key_str = os.getenv("ENCRYPTION_KEY")
+        environment = os.getenv("ENVIRONMENT", "development")
         
-        if key_str:
-            # Key provided as base64 string
-            try:
-                return key_str.encode()
-            except Exception:
-                # If not base64, derive a key from it
-                return self._derive_key(key_str.encode())
-        else:
-            # Generate a new key (for development only - should be set in production)
-            logger.warning("ENCRYPTION_KEY not set. Generating new key (not recommended for production)")
+        if not key_str:
+            if environment == "production":
+                logger.error("ENCRYPTION_KEY must be set in production!")
+                raise ValueError("ENCRYPTION_KEY environment variable must be set in production")
+            # Development only - generate key but NEVER log it
+            logger.warning("ENCRYPTION_KEY not set. Generating new key (dev only - NOT for production)")
             key = Fernet.generate_key()
-            logger.warning(f"Generated encryption key: {key.decode()}")
             logger.warning("Set ENCRYPTION_KEY environment variable to use this key")
+            # SECURITY: Never log the actual key value
             return key
+        
+        # Key provided as base64 string
+        try:
+            # Try to use as-is if it's a valid Fernet key
+            if len(key_str) == 44:  # Fernet keys are 44 chars base64
+                return key_str.encode()
+            # Otherwise derive from it
+            return self._derive_key(key_str.encode())
+        except Exception as e:
+            logger.error(f"Error processing encryption key: {str(e)}")
+            raise ValueError(f"Invalid encryption key format: {str(e)}")
     
     def _derive_key(self, password: bytes) -> bytes:
         """
@@ -75,8 +83,17 @@ class CredentialManager:
         Returns:
             Fernet-compatible key
         """
-        # Use a fixed salt for consistency (in production, store salt separately)
-        salt = b'mcp_config_server_salt_v1'
+        # Get salt from environment or use a default (for development)
+        # In production, salt should be stored separately and rotated
+        salt_str = os.getenv("ENCRYPTION_SALT")
+        if salt_str:
+            salt = salt_str.encode()
+        else:
+            # Development fallback - warn in production
+            if os.getenv("ENVIRONMENT") == "production":
+                logger.warning("ENCRYPTION_SALT not set - using default (not recommended)")
+            salt = b'mcp_config_server_salt_v1'  # Default for development only
+        
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
