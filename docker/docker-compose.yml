@@ -276,6 +276,45 @@ services:
     volumes:
       - mcp_config_data:/app/data
 
+  nft-software-engine:
+    build:
+      context: ../services/nft-software-engine
+      dockerfile: docker/Dockerfile
+    container_name: marketing-nft-engine
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-marketing}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-marketing_password}
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=nft_engine
+      - DATABASE_USERNAME=${POSTGRES_USER:-marketing}
+      - DATABASE_PASSWORD=${POSTGRES_PASSWORD:-marketing_password}
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-marketing}:${POSTGRES_PASSWORD:-marketing_password}@postgres:5432/nft_engine
+      - HOST=0.0.0.0
+      - PORT=8000
+      - WEB3_PROVIDER_URL=${WEB3_PROVIDER_URL:-https://polygon-rpc.com}
+      - NETWORK=${NETWORK:-polygon}
+      - CURRENCY=${CURRENCY:-MATIC}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:8501,http://localhost:3000}
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-change-me-in-production}
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    ports:
+      - "8002:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - marketing-network
+    profiles:
+      - services
+    volumes:
+      - nft_engine_data:/app/cache
+
 volumes:
   postgres_data:
     driver: local
@@ -290,6 +329,8 @@ volumes:
   dashboard_data:
     driver: local
   mcp_config_data:
+    driver: local
+  nft_engine_data:
     driver: local
 
 networks:
