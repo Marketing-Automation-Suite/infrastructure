@@ -32,18 +32,20 @@
 ## Repository Status
 
 ### All Submodule Repositories ✅
-- ✅ **xlam-server** - PR #1 merged, submodule updated
+- ✅ **xlam-server** - PR #1 merged, submodule at merge commit `cb1f5d62`
+  - ⚠️ **Note**: Untracked files present (`src/debug_log.py`, `src/middleware/`) - review recommended
 - ✅ **n8n-orchestration** - No PRs, clean
 - ✅ **crm-twenty** - No PRs, clean
 - ✅ **mautic-integration** - No PRs, clean
 - ✅ **analytics-lightdash** - No PRs, clean
-- ✅ **dashboard-streamlit** - No PRs, clean
+- ⚠️ **dashboard-streamlit** - Staged changes + untracked file (`src/pages/revenue.py`) - review recommended
 - ✅ **shared-libraries** - No PRs, clean
 
 ### Infrastructure Repository ✅
 - ✅ All PRs merged
 - ✅ Documentation updated
-- ✅ Submodules synced
+- ✅ Submodules at correct commits
+- ⚠️ **Note**: Some submodules have uncommitted local changes (see POST_MERGE_ACTION_PLAN.md)
 
 ## What Was Accomplished
 
@@ -66,17 +68,25 @@
 
 ## Next Steps
 
-1. **Testing:**
+### Immediate Actions
+1. **Submodule Cleanup** (Recommended):
+   - Review uncommitted changes in `xlam-server` and `dashboard-streamlit`
+   - Commit or remove as appropriate
+   - See `POST_MERGE_ACTION_PLAN.md` for detailed guidance
+
+2. **Integration Testing:**
    - Test MCP integration end-to-end
    - Verify all services communicate correctly
    - Run integration tests
+   - See `POST_MERGE_ACTION_PLAN.md` for test plan
 
-2. **Deployment:**
+3. **Deployment Preparation:**
    - Deploy updated services
    - Configure environment variables
    - Initialize databases
+   - See `POST_MERGE_ACTION_PLAN.md` for deployment checklist
 
-3. **Monitoring:**
+4. **Monitoring:**
    - Set up monitoring for new services
    - Configure alerts
    - Track service health
