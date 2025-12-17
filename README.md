@@ -31,7 +31,7 @@ This repository orchestrates all 12 service repositories:
 - **crm-twenty** - Modern CRM
 - **mautic-integration** - Marketing automation
 - **analytics-lightdash** - Business intelligence
-- **dashboard-streamlit** - Commander's Console
+- **dashboard-streamlit** - Prototype testing dashboard (Streamlit) - *Note: MVP dashboard will be built in React/HTML*
 - **shared-libraries** - Common code (jarvis_core)
 
 ### Services in Infrastructure Repo (5)

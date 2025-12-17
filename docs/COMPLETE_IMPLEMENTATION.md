@@ -30,11 +30,14 @@
 - Custom node structure
 
 ### Phase 5: The Face ✅
-- Streamlit dashboard implemented
+- **Prototype Dashboard:** Streamlit dashboard implemented for quick testing
+- **MVP Dashboard:** React/HTML dashboard - *To be implemented for production*
 - Chat interface for Admin Agent
 - Metrics dashboard
 - Workflow management
 - Full service integration
+
+**Note:** The Streamlit dashboard (`dashboard-streamlit`) is used for rapid prototype testing and API validation. The production MVP will use a React-based dashboard.
 
 ## Repository Structure
 
@@ -56,7 +59,7 @@ All service repositories have been created with:
 4. **crm-twenty** - CRM service structure
 5. **mautic-integration** - Marketing automation structure
 6. **analytics-lightdash** - Analytics with dbt models
-7. **dashboard-streamlit** - Commander's Console
+7. **dashboard-streamlit** - Prototype testing dashboard (Streamlit) - *MVP will use React/HTML*
 8. **shared-libraries** - Common code and API clients
 
 ## Next Steps

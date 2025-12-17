@@ -75,20 +75,28 @@
 6. Results → Dashboard
 
 ### Phase 5: The Face ✅
-**Status:** Complete
+**Status:** Prototype Complete, MVP Dashboard Pending
 
-**Deliverables:**
-- ✅ `services/dashboard-streamlit/` - Commander's Console
+**MVP Dashboard (Production):**
+- **Technology:** React, HTML, modern JavaScript
+- **Status:** To be implemented for MVP
+- **Purpose:** Production-ready user interface
+
+**Prototype Dashboard (Testing):**
+- ✅ `services/dashboard-streamlit/` - Prototype testing dashboard (Streamlit)
 - ✅ Chat interface for Admin Agent
 - ✅ Metrics dashboard
 - ✅ Workflow management
 - ✅ Integration with all services
+- **Purpose:** Quick prototype testing and API validation
 
-**Key Files:**
+**Key Files (Prototype):**
 - `src/app.py` - Main Streamlit app
 - `src/pages/chat_agent.py` - Chat interface
 - `src/pages/metrics.py` - Analytics dashboard
 - `src/pages/workflows.py` - Workflow management
+
+**Note:** The Streamlit dashboard serves as a rapid prototyping tool for testing and validation. The production MVP will use a React-based dashboard.
 
 ## 📦 Complete Service List
 
@@ -98,7 +106,7 @@
 3. ✅ **crm-twenty** - Modern CRM
 4. ✅ **mautic-integration** - Marketing automation
 5. ✅ **analytics-lightdash** - Business intelligence
-6. ✅ **dashboard-streamlit** - Commander's Console
+6. ✅ **dashboard-streamlit** - Prototype testing dashboard (Streamlit) - *MVP will use React/HTML*
 7. ✅ **shared-libraries** - Common code and API clients
 
 ### Services in Infrastructure Repo (5)

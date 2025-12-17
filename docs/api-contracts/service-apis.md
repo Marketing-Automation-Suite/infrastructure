@@ -74,13 +74,17 @@ This document defines the API contracts between all services in the Marketing Au
 - `GET /api/v1/metrics` - Get metrics
 - Read-only access to Postgres (read replica)
 
-### dashboard-streamlit
+### dashboard-streamlit (Prototype Testing)
 
 **Base URL:** `http://dashboard-streamlit:8501`
+
+**Purpose:** Quick prototype testing and validation
 
 **Endpoints:**
 - Web interface only (no API)
 - Communicates with other services via their APIs
+
+**Note:** This is a Streamlit-based prototype dashboard for testing. The production MVP dashboard will be built using React/HTML and will have its own API endpoints.
 
 ## API Versioning
 

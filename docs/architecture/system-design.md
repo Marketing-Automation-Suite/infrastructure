@@ -5,7 +5,7 @@
 **System Type:** Microservices-based Marketing Automation Platform
 **Architecture Pattern:** Event-driven, API-first microservices
 **Deployment Model:** Containerized (Docker/Kubernetes)
-**Primary Technology Stack:** Python, Node.js, PostgreSQL, Redis, n8n, Streamlit
+**Primary Technology Stack:** Python, Node.js, PostgreSQL, Redis, n8n, React (MVP Dashboard), Streamlit (Prototype Testing)
 
 **Confidence Level:** 95% (Based on implemented codebase analysis)
 
@@ -22,7 +22,7 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    User Interface Layer                      │
-│              (Streamlit Dashboard - Port 8501)              │
+│     (MVP Dashboard - React/HTML) / (Streamlit Prototype)     │
 └──────────────────────┬──────────────────────────────────────┘
                        │
                        ▼
@@ -88,7 +88,7 @@
 - **analytics-lightdash**: Business intelligence and reporting
 
 #### 1.3.3 The "Interface" Services
-- **dashboard-streamlit**: Commander's Console (user interface)
+- **dashboard-streamlit**: Prototype testing dashboard (Streamlit) - *MVP will use React/HTML*
 - **mcp-config-server**: Service marketplace and configuration
 - **nft-software-engine**: Blockchain-based licensing system
 
@@ -104,7 +104,7 @@
 ### 2.1 Primary User Flow
 
 ```
-1. User Command → Streamlit Dashboard (Port 8501)
+1. User Command → MVP Dashboard (React) or Streamlit Prototype
    └─> Natural language input via chat interface
 
 2. Dashboard → n8n Webhook (Port 5678)
@@ -243,11 +243,19 @@
 - Contacts: Personal information, communication history
 - Companies: Organization data, relationships
 
-### 3.4 dashboard-streamlit (Commander's Console)
+### 3.4 Dashboard (User Interface)
 
-**Purpose:** User interface for the entire system
+**MVP Dashboard (Production):**
+- **Technology:** React, HTML, modern JavaScript
+- **Purpose:** Production-ready user interface for the entire system
+- **Status:** To be implemented for MVP
 
-**Key Features:**
+**dashboard-streamlit (Prototype Testing):**
+- **Technology:** Streamlit (Python)
+- **Purpose:** Quick prototype testing and validation
+- **Status:** Active for rapid prototyping and API validation
+
+**Key Features (Both):**
 - Chat interface for Admin Agent (natural language commands)
 - Metrics dashboard (analytics visualization)
 - Workflow management interface
@@ -264,6 +272,8 @@
 - Upgrade: Tier upgrade interface
 - Referrals: Referral program management
 - Revenue: Revenue tracking and reporting
+
+**Note:** The Streamlit dashboard is used for quick prototype testing and validation. The MVP will use a React-based dashboard for production deployment.
 
 ### 3.5 mcp-config-server (Service Marketplace)
 

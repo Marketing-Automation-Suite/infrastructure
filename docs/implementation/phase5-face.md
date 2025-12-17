@@ -2,16 +2,43 @@
 
 ## Objectives
 
-Build Streamlit dashboard with chat interface and metrics.
+**MVP Dashboard:** Build production dashboard using React, HTML, and modern web technologies.
 
-## dashboard-streamlit Repository
+**Prototype Testing:** Use Streamlit dashboard for quick prototype testing and validation.
+
+## MVP Dashboard (Production)
+
+The production MVP dashboard will be built using:
+- **React** - Modern frontend framework
+- **HTML/CSS** - Core web technologies
+- **Modern JavaScript** - ES6+ features
+- **API Integration** - Connect to all backend services
+
+### MVP Dashboard Features
+- Chat interface for Admin Agent (natural language commands)
+- Metrics dashboard (analytics visualization)
+- Workflow management interface
+- Wallet management (NFT integration)
+- Upgrade system (tier management)
+- Referrals system
+- Revenue tracking
+
+## dashboard-streamlit Repository (Prototype Testing)
+
+**Purpose:** Quick prototype testing and validation before MVP development.
+
+The Streamlit dashboard serves as a rapid prototyping tool to:
+- Test API integrations
+- Validate service connections
+- Prototype UI/UX concepts
+- Quick demos and proof-of-concept
 
 ### Setup Steps
 
 1. Create repository: `Marketing-Automation-Suite/dashboard-streamlit`
 2. Set up git submodule for `shared-libraries`
-3. Build Streamlit app
-4. Integrate with all services
+3. Build Streamlit app for prototype testing
+4. Integrate with all services for validation
 
 ### App Structure
 
